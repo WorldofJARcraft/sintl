@@ -48,7 +48,10 @@ target_include_directories(msgfmt PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include
 target_include_directories(msgfmt_rev PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 target_include_directories(smsgfmt PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 
-
+# utilities are internationalized using gettext internally
+target_link_libraries(msgfmt sintl)
+target_link_libraries(smsgfmt sintl)
+target_link_libraries(msgfmt_rev sintl)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../config/CMakeLists.txt)
 
 configure_libsintl(sintl)

@@ -42,7 +42,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-#include <alloca.h>
 #include <unistd.h>
 #include <errno.h>
 #include "gnu_errmsg.h"

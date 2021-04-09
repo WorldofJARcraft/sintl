@@ -1,4 +1,5 @@
 /*
+
  * CDDL HEADER START
  *
  * The contents of this file are subject to the terms of the
@@ -57,7 +58,7 @@ extern "C" {
 
 #else  /* !defined(__sparcv9) */
 
-#error "Unknown architecture"
+#define _MACH64_NAME		"unknown"
 
 #endif /* defined(__sparcv9) */
 

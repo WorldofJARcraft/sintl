@@ -83,7 +83,7 @@ static int libsintl_naive_issetugid(void){
 #endif
 
 #define HAVE_QUERYLOCALE_OR_GETLOCALENAME_L (defined(HAVE_GETLOCALENAME_L) || defined(HAVE_QUERYLOCALE))
-#define HAVE_USABLE_USELOCALE (defined(HAVE_USELOCALE) && HAVE_QUERYLOCALE_OR_GETLOCALENAME_L)
+#define HAVE_USABLE_USELOCALE (defined(HAVE_USELOCALE) && defined(HAVE_QUERYLOCALE_OR_GETLOCALENAME_L))
 
 // without these interfaces, there is no way of mapping a locale_t to a locale name 
 #if HAVE_USABLE_USELOCALE

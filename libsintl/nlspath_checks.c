@@ -38,7 +38,7 @@
 #include "libsintl_config.h"
 #include "nlspath_checks.h"
 
-extern const char **_environ;
+extern const char **environ;
 
 /*
  * We want to prevent the use of NLSPATH by setugid applications but
@@ -607,14 +607,14 @@ clean_env(void)
 {
 	const char **p;
 
-	if (_environ == NULL) {
+	if (environ == NULL) {
 		/* can happen when processing a SunOS 4.x AOUT file */
 		nlspath_safe = 1;
 		return;
 	}
 
 	/* Find the first NLSPATH occurrence */
-	for (p = _environ; *p; p++)
+	for (p = environ; *p; p++)
 		if (**p == 'N' && nvmatch("NLSPATH", *p) != NULL)
 			break;
 
