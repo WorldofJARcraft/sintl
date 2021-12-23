@@ -2684,6 +2684,8 @@ hash_init(size)
 	return (h_size);
 }
 
+#define EXIT_NOMEM
+
 /*
  * Hash enter
  */
@@ -2691,6 +2693,7 @@ static void
 hash_build(str)
 	char			*str;
 {
+	char *str_copy;
 	register struct h_elem	*hp;
 	register	size_t	len;
 	register	int	hv;
@@ -2703,11 +2706,21 @@ hash_build(str)
 
 	size = hash_init(HASH_DFLT_SIZE);
 
+	str_copy = strdup(str);
+	
+	/*
+	 * The code below needs a writable copy of str.
+	 */
+	if(!str_copy){
+		perror("Failed to initialize hash table");
+		exit(1);
+	}
+
 	/*
 	 * If the keyword contains a ':', then the right side holds the
 	 * parameter specification for the function.
 	 */
-	p = strchr(str, ':');
+	p = strchr(str_copy, ':');
 	if (p) {
 		long	l;
 		char	c;
@@ -2742,7 +2755,7 @@ hash_build(str)
 				ep++;
 			p = ep;
 		}
-		if (*p) {		/* Thirs parameter */
+		if (*p) {		/* Third parameter */
 			l = strtol(p, &ep, 10);
 			c = *ep;
 			i2param = l;
@@ -2750,6 +2763,8 @@ hash_build(str)
 	} else {
 		i1param = 1;
 	}
+
+	free(str_copy);
 
 	if (dparam == 0 || i1param == 0 || i2param == 0) {
 		fprintf(stderr,
