@@ -54,3 +54,12 @@ sudo cmake --install . # --prefix $PREFIX
 ```
 In the last step, you can use --prefix to install the sintl library, headers and binaries to a prefix other than / (e.g. /opt/sintl).  
 If you install sintl to a non-default prefix, make sure to include $PREFIX/bin in your PATH and use the compiler / linker flags -I$PREFIX/include and -L$PREFIX/lib when using the utilities or linking against the library.
+
+## Testing
+
+Configure and build first.
+
+```bash
+cd build
+ctest -V
+```

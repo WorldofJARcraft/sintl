@@ -24,23 +24,25 @@
 # Use is subject to license terms.
 #
 
-cmake_minimum_required (VERSION 2.8.11)
+#
+# Simple test case for msgfmt - the third string should be ignored
+#
 
-project(sintl)
+msgid ""
+msgstr "nplurals=2; plural= n==1 ? 1 : 0"
+"charset=ASCII"
 
-set(SINTL_MAJOR_VERSION "0")
-set(SINTL_MINOR_VERSION "1")
-set(SINTL_PATCH_VERSION "1")
+msgid "duplicate"
+msgid_plural "duplicates"
+msgstr[0] "Duplikate"
+msgstr[1] "Duplikat"
 
-enable_testing()
+msgid "not duplicate"
+msgid_plural "not duplicates"
+msgstr[0] "keine Duplikate"
+msgstr[1] "kein Duplikat"
 
-# the sintl library
-add_subdirectory(libsintl)
-# the sintl headers
-add_subdirectory(include)
-# the gettext / ngettext utilities
-add_subdirectory(gettext)
-# the msgfmt utilities
-add_subdirectory(msgfmt)
-# the xgettext utility
-add_subdirectory(xgettext)
+msgid "duplicate"
+msgid_plural "duplicates"
+msgstr[0] "keine Duplikate?"
+msgstr[1] "kein Duplikat?"

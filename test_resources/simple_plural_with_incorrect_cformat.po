@@ -24,23 +24,21 @@
 # Use is subject to license terms.
 #
 
-cmake_minimum_required (VERSION 2.8.11)
+#
+# msgfmt test case - simple 2-plural language
+msgid ""
+msgstr "nplurals=2; plural= n==1 ? 1 : 0"
+"charset=ASCII"
 
-project(sintl)
+# translation lacks format - msgfmt should warn 
+#, c-format
+msgid "%d test messages"
+msgid_plural "%d test messages"
+msgstr[0] "%d Testnachrichten"
+msgstr[1] "eine Testnachricht"
 
-set(SINTL_MAJOR_VERSION "0")
-set(SINTL_MINOR_VERSION "1")
-set(SINTL_PATCH_VERSION "1")
-
-enable_testing()
-
-# the sintl library
-add_subdirectory(libsintl)
-# the sintl headers
-add_subdirectory(include)
-# the gettext / ngettext utilities
-add_subdirectory(gettext)
-# the msgfmt utilities
-add_subdirectory(msgfmt)
-# the xgettext utility
-add_subdirectory(xgettext)
+#, c-format
+msgid "%d format message"
+msgid_plural "%d formatted messages"
+msgstr[0] "%d formatierte Nachrichten"
+msgstr[1] "%d formatierte Nachricht"

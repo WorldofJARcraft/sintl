@@ -55,3 +55,45 @@ configure_libsintl(sintl)
 
 
 install(TARGETS msgfmt msgfmt_rev smsgfmt DESTINATION bin)
+
+add_test(NAME msgfmt_processes_sun_po COMMAND msgfmt -v -o ${CMAKE_BINARY_DIR}/messages.mo ${CMAKE_SOURCE_DIR}/test_resources/singular_only_po.po )
+set_property (TEST msgfmt_processes_sun_po
+              PROPERTY PASS_REGULAR_EXPRESSION "2 translated message\\(s\\), 0 fuzzy translation\\(s\\), 0 untranslated message\\(s\\).")
+set_property (TEST msgfmt_processes_sun_po
+              PROPERTY FAIL_REGULAR_EXPRESSION "WARNING" "ERROR")
+
+add_test(NAME msgfmt_processes_simple_plural_po COMMAND msgfmt -v -o ${CMAKE_BINARY_DIR}/messages.mo ${CMAKE_SOURCE_DIR}/test_resources/simple_plural.po)
+set_property (TEST msgfmt_processes_simple_plural_po
+              PROPERTY PASS_REGULAR_EXPRESSION "1 translated message\\(s\\), 0 fuzzy translation\\(s\\), 0 untranslated message\\(s\\).")
+set_property (TEST msgfmt_processes_simple_plural_po
+              PROPERTY FAIL_REGULAR_EXPRESSION "WARNING" "ERROR")
+
+add_test(NAME msgfmt_processes_multiple_domains_plural_po COMMAND msgfmt -v ${CMAKE_SOURCE_DIR}/test_resources/multi_domain_plural.po)
+set_property (TEST msgfmt_processes_multiple_domains_plural_po
+                            PROPERTY PASS_REGULAR_EXPRESSION "5 translated message\\(s\\), 0 fuzzy translation\\(s\\), 0 untranslated message\\(s\\).")
+set_property (TEST msgfmt_processes_multiple_domains_plural_po
+                            PROPERTY FAIL_REGULAR_EXPRESSION "WARNING" "ERROR")
+
+add_test(NAME msgfmt_processes_simple_plural_with_fuzzy COMMAND msgfmt -v -o ${CMAKE_BINARY_DIR}/messages.mo ${CMAKE_SOURCE_DIR}/test_resources/simple_plural_with_fuzzy.po)
+set_property (TEST msgfmt_processes_simple_plural_with_fuzzy
+              PROPERTY PASS_REGULAR_EXPRESSION "1 translated message\\(s\\), 1 fuzzy translation\\(s\\), 0 untranslated message\\(s\\).")
+set_property (TEST msgfmt_processes_simple_plural_with_fuzzy
+              PROPERTY FAIL_REGULAR_EXPRESSION "WARNING" "ERROR")
+
+add_test(NAME msgfmt_processes_simple_plural_with_cformat COMMAND msgfmt -v -o ${CMAKE_BINARY_DIR}/messages.mo ${CMAKE_SOURCE_DIR}/test_resources/simple_plural_with_cformat.po)
+set_property (TEST msgfmt_processes_simple_plural_with_cformat
+              PROPERTY PASS_REGULAR_EXPRESSION "2 translated message\\(s\\), 0 fuzzy translation\\(s\\), 0 untranslated message\\(s\\).")
+set_property (TEST msgfmt_processes_simple_plural_with_cformat
+              PROPERTY FAIL_REGULAR_EXPRESSION "WARNING" "ERROR")
+
+add_test(NAME msgfmt_processes_simple_plural_with_incorrect_cformat COMMAND msgfmt -v -o ${CMAKE_BINARY_DIR}/messages.mo ${CMAKE_SOURCE_DIR}/test_resources/simple_plural_with_incorrect_cformat.po)
+set_property (TEST msgfmt_processes_simple_plural_with_incorrect_cformat
+             PROPERTY PASS_REGULAR_EXPRESSION "ERROR: 1 error\\(s\\) found.")
+
+add_test(NAME msgfmt_fails_at_duplicate_msgid_singular COMMAND msgfmt -v -o ${CMAKE_BINARY_DIR}/messages.mo ${CMAKE_SOURCE_DIR}/test_resources/duplicate_msgids_singular.po)
+set_property (TEST msgfmt_fails_at_duplicate_msgid_singular
+             PROPERTY PASS_REGULAR_EXPRESSION "ERROR: 1 error\\(s\\) found.")
+
+add_test(NAME msgfmt_fails_at_duplicate_msgid_plural COMMAND msgfmt -v -o ${CMAKE_BINARY_DIR}/messages.mo ${CMAKE_SOURCE_DIR}/test_resources/duplicate_msgids_singular.po)
+set_property (TEST msgfmt_fails_at_duplicate_msgid_plural
+             PROPERTY PASS_REGULAR_EXPRESSION "ERROR: 1 error\\(s\\) found.")
