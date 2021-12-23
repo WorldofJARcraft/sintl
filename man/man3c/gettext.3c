@@ -1,0 +1,793 @@
+'\" te
+.\" Copyright (c) 2008, Sun Microsystems, Inc.  All Rights Reserved
+.\" Copyright (c) 2012-2020, J. Schilling
+.\" Copyright (c) 2013, Andreas Roehler
+.\" CDDL HEADER START
+.\"
+.\" The contents of this file are subject to the terms of the
+.\" Common Development and Distribution License ("CDDL"), version 1.0.
+.\" You may only use this file in accordance with the terms of version
+.\" 1.0 of the CDDL.
+.\"
+.\" A full copy of the text of the CDDL should have accompanied this
+.\" source.  A copy of the CDDL is also available via the Internet at
+.\" http://www.opensource.org/licenses/cddl1.txt
+.\"
+.\" When distributing Covered Code, include this CDDL HEADER in each
+.\" file and include the License file at usr/src/OPENSOLARIS.LICENSE.
+.\" If applicable, add the following below this CDDL HEADER, with the
+.\" fields enclosed by brackets "[]" replaced with your own identifying
+.\" information: Portions Copyright [yyyy] [name of copyright owner]
+.\"
+.\" CDDL HEADER END
+.TH gettext 3C "27 Feb 2020" "SunOS 5.11" "Standard C Library Functions"
+.SH NAME
+gettext, dgettext, dcgettext, ngettext, dngettext, dcngettext, textdomain,
+bindtextdomain, bind_textdomain_codeset \- message handling functions
+.SH SYNOPSIS
+.SS "Solaris and GNU-compatible"
+.LP
+.nf
+#include <libintl.h>
+
+.B char *gettext\c
+.RB ( "const char *\c"
+.IR msgid );
+.fi
+
+.LP
+.nf
+.B char *dgettext\c
+.RB ( "const char *\c
+.IR domainname ", \c
+.BI "const char *" msgid\c
+);
+.fi
+
+.LP
+.nf
+.B char *textdomain\c
+.RB ( "const char *\c
+.IR domainname );
+.fi
+
+.LP
+.nf
+.B char *bindtextdomain\c
+.RB ( "const char *\c
+.IR domainname ", \c
+.BI "const char *" dirname\c
+);
+.fi
+
+.LP
+.nf
+#include <libintl.h>
+#include <locale.h>
+
+.B char *dcgettext\c
+.RB ( "const char *\c
+.IR domainname ", \c
+.BI "const char *" msgid\c
+,
+.BI "     int " category\c
+);
+.fi
+
+.SS "GNU-compatible"
+.LP
+.nf
+#include <libintl.h>
+
+.BR "char *ngettext" (\c
+.BI "const char *" msgid1\c
+, \c
+.BI "const char *" msgid2\c
+,
+.BI "     unsigned long int " n\c
+);
+.fi
+
+.LP
+.nf
+.BR "char *dngettext" (\c
+.BI "const char *" domainname\c
+, \c
+.BI "const char *" msgid1\c
+,
+.BI "     const char *" msgid2\c
+, \c
+.BI "unsigned long int " n\c
+);
+.fi
+
+.LP
+.nf
+.BR "char *bind_textdomain_codeset" (\c
+.BI "const char *" domainname\c
+,
+.BI "     const char *" codeset\c
+);
+.fi
+
+.LP
+.nf
+extern int _nl_msg_cat_cntr;
+extern int *_nl_domain_bindings;
+.fi
+
+.LP
+.nf
+#include <libintl.h>
+#include <locale.h>
+
+.BR "char *dcngettext" (\c
+.BI "const char *" domainname\c
+, \c
+.BI "const char *" msgid1\c
+,
+.BI "     const char *" msgid2\c
+, \c
+.BI "unsigned long int " n\c
+, \c
+.BI "int " category\c
+);
+.fi
+
+.SH DESCRIPTION
+.sp
+.LP
+The
+.BR gettext (),
+.BR dgettext (),
+and
+.BR dcgettext ()
+functions
+attempt to retrieve a target string based on the specified
+.IR msgid
+argument within the context of a specific domain and the current locale. The
+.\" active locale of the current thread (hereafter current locale).
+length of strings returned by
+.BR gettext (),
+.BR dgettext (),
+and
+.BR dcgettext ()
+is undetermined until the function is called. The
+.I msgid
+argument is a null-terminated string.
+.sp
+.LP
+The
+.BR ngettext (),
+.BR dngettext (),
+and
+.BR dcngettext ()
+functions are
+equivalent to
+.BR gettext (),
+.BR dgettext (),
+and
+.BR dcgettext (),
+respectively, except for the handling of plural forms.  These functions work
+only with GNU-compatible message catalogues.  The
+.BR ngettext (),
+.BR dngettext (),
+and
+.BR dcngettext ()
+functions search for the message
+string using the
+.I msgid1
+argument as the key and the
+.I n
+argument to
+determine the plural form.  If no message catalogues are found,
+.I msgid1
+is returned if
+.I n
+== 1, otherwise
+.I msgid2
+is returned.
+.sp
+.LP
+The
+.B NLSPATH
+environment variable (see
+.BR environ (5))
+is searched
+first for the location of the
+.B LC_MESSAGES
+catalogue. The setting of the
+.B LC_MESSAGES
+category of the current locale determines the locale used by
+.BR gettext ()
+and
+.BR dgettext ()
+for string retrieval. The
+.I category
+argument determines the locale used by
+.BR dcgettext ().
+If
+.B NLSPATH
+is not defined and the current locale is "C",
+.BR gettext (),
+.BR dgettext (),
+and
+.BR dcgettext ()
+simply return the message string that
+was passed.  In a locale  other than "C", if
+.B NLSPATH
+is not defined or
+if a message catalogue is not found in any of the components specified by
+.BR NLSPATH ,
+the routines search for the message catalogue using the scheme
+described in the following paragraph.
+.sp
+.LP
+The
+.B LANGUAGE
+environment variable is examined to determine the
+GNU-compatible message catalogues to be used. The value of
+.B LANGUAGE
+is a
+list of locale names separated by a colon (':') character.  If
+.B LANGUAGE
+is defined, each locale name is tried in the specified order and if a
+GNU-compatible message catalogue is found, the message is returned.  If a
+GNU-compatible message catalogue is found but failed to find a corresponding
+.IR msgid ,
+the
+.I msgid
+string is returned. If
+.B LANGUAGE
+is not
+defined or if a Solaris message catalogue is found or no GNU-compatible
+message catalogue is found in processing
+.BR LANGUAGE ,
+the pathname used to
+locate the message catalogue is
+.IR dirname / locale / category /\c
+.IR domainname .mo,
+where
+.I dirname
+is the directory specified by
+.BR bindtextdomain (),
+.I locale
+is a locale name, and
+.I category
+is either
+.BR LC_MESSAGES
+if
+.BR gettext (),
+.BR dgettext (),
+.BR ngettext (),
+or
+.BR dngettext ()
+is called, or
+.B LC_XXX
+where the name is the same as the locale category
+name specified by the
+.I category
+argument to
+.BR dcgettext ()
+or
+.BR dcngettext ().
+.sp
+.LP
+The
+.BR dcgettext ()
+and
+.BR dcngettext ()
+functions require an additional argument
+.I category
+that specifies the message category to be used. The argument
+.I category
+cannot be
+.BR LC_ALL .
+.sp
+.LP
+For
+.BR gettext ()
+and
+.BR ngettext (),
+the domain used is set by the last
+valid call to
+.BR textdomain ().
+If a valid call to
+.BR textdomain ()
+has
+not been made, the default domain  (called
+.BR messages )
+is used.
+.sp
+.LP
+For
+.BR dgettext (),
+.BR dcgettext (),
+.BR dngettext (),
+and
+.BR dcngettext (),
+the domain used is specified by the
+.IR domainname
+argument. The
+.I domainname
+argument is equivalent in syntax and meaning to
+the
+.I domainname
+argument to
+.BR textdomain (),
+except that the selection
+of the domain is valid only for the duration of the
+.BR dgettext (),
+.BR dcgettext (),
+.BR dngettext (),
+or
+.BR dcngettext ()
+function call.
+.de ..
+.sp
+.LP
+The functions
+.BR gettext_l (),
+.BR dgettext_l (),
+.BR dcgettext_l (),
+.BR ngettext_l (),
+.B dngettext_l ()
+and 
+.B dcngettext_l ()
+behave like the respective functions without the
+.B _l
+suffix, but they accept an additional
+.B locale_t
+parameter that overrides the currently set locale for this call.
+If the locale argument is not a valid locale or
+.BR LC_GLOBAL_LOCALE ,
+the results are unspecified. 
+..
+.sp
+.LP
+The
+.BR textdomain ()
+function sets or queries the name of the current
+domain of the active
+.B LC_MESSAGES
+.RI "locale category. The" " domainname"
+argument is a null-terminated string that can contain only the characters
+allowed in legal filenames.
+.sp
+.LP
+The
+.I domainname
+argument is the unique name of a domain on the system.
+If there are multiple versions of the same domain on one system, namespace
+collisions can be avoided by using
+.BR bindtextdomain ().
+If
+.BR textdomain ()
+is not called, a default domain is selected. The setting of
+domain made by the last valid call to
+.BR textdomain ()
+remains valid across
+subsequent calls to
+.BR setlocale "(3C), and"
+.BR gettext ().
+.sp
+.LP
+The
+.I domainname
+argument is applied to the currently active
+.B LC_MESSAGES
+locale.
+.sp
+.LP
+The current setting of the domain can be queried without affecting the
+current state of the domain by calling
+.BR textdomain ()
+with
+.I domainname
+set to the null pointer. Calling
+.BR textdomain ()
+with a
+.I domainname
+argument of a null string sets the domain to the default
+domain
+.RB ( messages ).
+.sp
+.LP
+The
+.BR bindtextdomain ()
+function binds the path predicate for a message
+domain
+.I domainname
+to the value contained in
+.IR dirname .
+If
+.I domainname
+is a non-empty string and has not been bound previously,
+.BR bindtextdomain ()
+binds
+.I domainname
+with
+.IR dirname .
+.sp
+.LP
+If
+.I domainname
+is a non-empty string and has been bound previously,
+.BR bindtextdomain ()
+replaces the old binding with
+.IR dirname .
+The
+.I dirname
+argument can be an absolute or relative pathname being resolved
+when
+.BR gettext (),
+.BR dgettext (),
+or
+.BR dcgettext ()
+are called. If
+.I domainname
+is a null pointer or an empty string,
+.BR bindtextdomain ()
+returns
+.I NULL.
+User defined domain names cannot begin with the string
+.BR SYS_ .
+Domain names beginning with this string are reserved for system
+use.
+.sp
+.LP
+The
+.BR bind_textdomain_codeset ()
+function can be used to specify the
+output codeset for message catalogues for domain
+.IR domainname .
+If
+.I domainname
+is a null pointer or an empty string,
+.BR bind_textdomain_codeset ()
+returns
+.I NULL.
+The
+.I codeset
+argument must be a valid codeset name that can be used for the
+.BR iconv_open (3C)
+function, or a null pointer. If the
+.I codeset
+argument is the null pointer,
+.BR bind_textdomain_codeset ()
+returns the
+currently selected codeset for the domain with the name
+.IR domainname .
+It returns a null pointer if a codeset has not yet been selected. The
+.BR bind_textdomain_codeset ()
+function can be used multiple times.  If used
+multiple times with the same
+.I domainname
+argument, the later call
+overrides the settings made by the earlier one. The
+.BR bind_textdomain_codeset ()
+function returns a pointer to a string
+containing the name of the selected codeset. The string is allocated
+internally in the function and must not be changed by the user.
+.sp
+.LP
+The external variables
+.B _nl_msg_cat_cntr
+and
+.BR _nl_domain_bindings
+are provided for the compatibility with the GNU
+.BR gettext ()
+implementation.
+.SH RETURN VALUES
+.sp
+.LP
+The
+.BR gettext (),
+.BR dgettext (),
+and
+.BR dcgettext ()
+functions return
+the message string if the search succeeds. Otherwise they return the
+.I msgid
+string.
+.sp
+.LP
+The
+.BR ngettext (),
+.BR dngettext (),
+and
+.BR dcngettext ()
+functions
+return the message string if the search succeeds.  If the search fails,
+.I msgid1
+is returned if
+.I n
+== 1. Otherwise
+.I msgid2
+is
+returned.
+.sp
+.LP
+The individual bytes of the string returned by
+.BR gettext (),
+.BR dgettext (),
+.BR dcgettext (),
+.BR ngettext (),
+.BR dngettext (),
+or
+.BR dcngettext ()
+can contain any value other than
+.IR NULL .
+If
+.IR msgid
+is a null pointer, the return value is undefined. The string returned must not
+be modified by the program and can be invalidated by a subsequent call to
+.B bind_textdomain_codeset()
+or
+.BR setlocale (3C).
+If the
+.I
+domainname \c
+argument to
+.BR dgettext (),
+.BR dcgettext (),
+.BR dngettext (),
+or
+.BR dcngettext ()
+is a null pointer, the the domain
+currently bound by
+.BR textdomain ()
+is used.
+.sp
+.LP
+The normal return value from
+.BR textdomain ()
+is a pointer to a string
+containing the current setting of the domain. If
+.I domainname
+is a null
+pointer,
+.BR textdomain ()
+returns a pointer to the string containing the
+current domain. If
+.BR textdomain ()
+was not previously called and
+.I domainname
+is a null string, the name of the default domain is returned.
+The name of the default domain is
+.BR messages .
+If
+.BR textdomain ()
+fails,
+a null pointer is returned.
+.sp
+.LP
+The return value from
+.BR bindtextdomain ()
+is a null-terminated string
+containing
+.I dirname
+or the directory binding associated with
+.I domainname
+if
+.I dirname
+is
+.I NULL.
+If no binding is found, the
+default return value is
+.BR /usr/lib/locale .
+If
+.I domainname
+is a null
+pointer or an empty string,
+.BR bindtextdomain ()
+takes no action and returns
+a null pointer. The string returned must not be modified by the caller. If
+.BR bindtextdomain ()
+fails, a null pointer is returned.
+.sp
+.LP
+The
+.BR bind_textdomain_codeset ()
+function returns the currently selected
+.I codeset
+name. It returns a null pointer if no
+.I codeset
+has yet been selected. 
+If
+.BR bind_textdomain_codeset ()
+fails, a null pointer is returned.
+.SH ERRORS
+.sp
+.LP
+The
+.BR gettext (),
+.BR dgettext (),
+.BR dcgettext (),
+.BR ngettext (),
+.BR dngettext ()
+and
+.BR dcngettext ()
+functions will not modify
+the external variable
+.IR errno .
+In case an error happens these functions return the
+.I msgid
+parameter.
+.LP
+The
+.BR textdomain (),
+.BR bindtextdomain ()
+and
+.BR bind_textdomain_codeset ()
+functions may fail if:
+.sp
+.TP 12
+.B ENOMEM
+Insufficient memory available.
+
+.SH USAGE
+.sp
+.LP
+These functions impose no limit on message length. However, a text
+.I domainname
+is limited to
+.B TEXTDOMAINMAX
+(256) bytes.
+.sp
+.LP
+The
+.BR gettext (),
+.BR dgettext (),
+.BR dcgettext (),
+.BR ngettext (),
+.BR dngettext (),
+.BR dcngettext (),
+.BR textdomain (), 
+and
+.BR bindtextdomain ()
+functions can be used safely in multithreaded
+applications, as long as
+.BR setlocale (3C)
+is not being called to change the
+locale.
+.sp
+.LP
+The
+.BR gettext (),
+.BR dgettext (),
+.BR dcgettext (),
+.BR textdomain (),
+and
+.BR bindtextdomain ()
+functions work with both Solaris message catalogues
+and GNU-compatible message catalogues.  The
+.BR ngettext (),
+.BR dngettext (),
+.BR dcngettext (),
+and
+.BR bind_textdomain_codeset ()
+functions work only with GNU-compatible message catalogues.  See
+.BR msgfmt (1)
+for information about Solaris message catalogues and
+GNU-compatible message catalogues.
+.SH FILES
+.sp
+.ne 2
+.TP 4n
+.B /usr/lib/locale
+.sp .6
+default path predicate for message domain files
+
+.sp
+.ne 2
+.TP
+.BI /usr/lib/locale/ locale /LC_MESSAGES/ domainname \&.mo
+.sp .6
+system default location for file containing messages for language
+.I locale
+and
+.IR domainname
+
+.sp
+.ne 2
+.TP
+.BI /usr/lib/locale/ locale /LC_XXX/ domainname \&.mo
+.sp .6
+system default location for file containing messages for language
+.I locale
+and
+.I domainname
+for
+.BR dcgettext ()
+calls where
+.B LC_XXX
+is
+.BR LC_CTYPE ,
+.BR LC_NUMERIC ,
+.BR LC_TIME ,
+.BR LC_COLLATE ,
+.BR LC_MONETARY ,
+or
+.BR LC_MESSAGES
+
+.sp
+.ne 2
+.TP
+.IB dirname /  locale /LC_MESSAGES/ domainname \&.mo
+.sp .6
+location for file containing messages for domain
+.I domainname
+and path
+predicate
+.I dirname
+after a successful call to
+.BR bindtextdomain ()
+
+.sp
+.ne 2
+.TP
+.IB dirname / locale /LC_XXX/ domainname \&.mo
+.sp .6
+location for files containing messages for domain
+.I domainname,
+language
+.I locale,
+and path predicate
+.I dirname
+after a successful call to
+.BR bindtextdomain ()
+for
+.BR dcgettext ()
+calls where
+.B LC_XXX
+is one
+of
+.BR LC_CTYPE ,
+.BR LC_NUMERIC ,
+.BR LC_TIME ,
+.BR LC_COLLATE ,
+.BR LC_MONETARY ,
+or
+.BR LC_MESSAGES
+
+.SH ATTRIBUTES
+.sp
+.LP
+See
+.BR attributes (5)
+for descriptions of the following attributes:
+.sp
+
+.sp
+.TS
+tab() box;
+lbw(2.75i) |lbw(2.75i)
+lw(2.75i) |lw(2.75i)
+.
+ATTRIBUTE TYPEATTRIBUTE VALUE
+_
+Interface StabilitySee below.
+_
+MT-LevelSafe with exceptions
+.TE
+
+.sp
+.LP
+The external variables
+.B _nl_msg_cat_cntr
+and
+.BR _nl_domain_bindings
+are Uncommitted.
+.SH SEE ALSO
+.sp
+.LP
+.BR msgfmt (1),
+.BR xgettext (1),
+.BR gettext (1),
+.BR ngettext (1),
+.BR iconv_open (3C),
+.BR libintl.h (3HEAD),
+.BR setlocale (3C),
+.BR attributes (5),
+.BR environ (5)

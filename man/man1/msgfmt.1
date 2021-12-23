@@ -1,0 +1,761 @@
+'\" te
+.\" Copyright (c) 2001, Sun Microsystems, Inc. All Rights Reserved
+.\" Copyright (c) 2012-2020, J. Schilling
+.\" Copyright (c) 2013, Andreas Roehler
+.\" CDDL HEADER START
+.\"
+.\" The contents of this file are subject to the terms of the
+.\" Common Development and Distribution License ("CDDL"), version 1.0.
+.\" You may only use this file in accordance with the terms of version
+.\" 1.0 of the CDDL.
+.\"
+.\" A full copy of the text of the CDDL should have accompanied this
+.\" source.  A copy of the CDDL is also available via the Internet at
+.\" http://www.opensource.org/licenses/cddl1.txt
+.\"
+.\" When distributing Covered Code, include this CDDL HEADER in each
+.\" file and include the License file at usr/src/OPENSOLARIS.LICENSE.
+.\" If applicable, add the following below this CDDL HEADER, with the
+.\" fields enclosed by brackets "[]" replaced with your own identifying
+.\" information: Portions Copyright [yyyy] [name of copyright owner]
+.\"
+.\" CDDL HEADER END
+.TH msgfmt 1 "27 Feb 2020" "SunOS 5.11" "User Commands"
+.SH NAME
+msgfmt \- create a message object from a message file
+.SH SYNOPSIS
+.LP
+.nf
+.BR msgfmt " [\c
+.B -D \c
+.IR dir " | \c
+.BR -\(midirectory =\c
+.IR dir ]
+.RB "     [" -f\c
+ | \c
+.BR -\(miuse-fuzzy "] \c
+.RB [ -g ]
+.RB "     [" -o\c
+.I " output-file\c
+ | \c
+.BR -\(mioutput-file =\c
+.IR output-file ]
+.RB "     [" -s "] \c
+.RB [ -\(mistrict " | " \-S "] \c
+.RB [ -v "] \c
+.RB [ -\(miverbose "] \c
+.IR filename .po.\|.\|.
+.fi
+
+.SH DESCRIPTION
+.sp
+.LP
+The
+.B msgfmt
+utility creates message object files from portable object
+files
+.RI ( filename\c
+.BR \&.po ),
+without changing the portable object
+files.
+.sp
+.LP
+The
+.B \&.po
+file contains messages displayed to users by system
+commands or by application programs.
+.B \&.po
+files can be edited. The
+messages in these files can be rewritten in any language supported by the
+system.
+.sp
+.LP
+The
+.BR xgettext (1)
+command can be used to create
+.B \&.po
+files from
+script or programs.
+.sp
+.LP
+.B msgfmt
+interprets data as characters according to the current setting
+of the
+.B LC_CTYPE
+locale category or according to the codeset specified
+in the
+.B \&.po
+file.
+.SH OPTIONS
+.sp
+.LP
+The following options are supported:
+.sp
+.ne 2
+.PD 0
+.TP 27n
+.BI -D " dir
+.TP
+.BI -\(midirectory= dir
+.PD
+Adds
+.I dir
+to the list for input files search.
+
+.sp
+.ne 2
+.PD 0
+.TP
+.B -f
+.TP
+.B -\(miuse-fuzzy
+.PD
+Uses fuzzy entries in output. If this option is not specified, fuzzy
+entries are not included into the output. These options are ignored if
+Solaris message catalogs are processed.
+
+.sp
+.ne 2
+.TP
+.B -g
+Directs the utility to generate the GNU-compatible message catalog file.
+This option cannot be specified with the
+.B -s
+option.
+
+.sp
+.ne 2
+.PD 0
+.TP
+.BI -o " output-file
+.TP
+.BI -\(mioutput= output-file
+.PD
+Specifies the output file name as
+.IR output-file .
+All domain directives
+and duplicate msgids in the
+.RB . po
+file are ignored.
+
+.sp
+.ne 2
+.TP
+.B -s
+Directs the utility to generate the Solaris message catalog file. This
+option cannot be specified with the
+.B -g
+option.
+
+.sp
+.ne 2
+.PD 0
+.TP
+.B -\(mistrict
+.TP
+.B \-S
+.PD
+Directs the utility to append the suffix
+.B \&.mo
+to the generating
+message object file name if it doesn't have this suffix. This option is
+ignored if Solaris message catalogs are processed.
+
+.sp
+.ne 2
+.PD 0
+.TP
+.B -v
+.TP
+.B -\(miverbose
+.PD
+Verbose. Lists duplicate message identifiers if Solaris message catalog
+files are processed. Message strings are not redefined.
+.sp
+If GNU-compatible message files are processed, this option detects and
+diagnoses input file anomalies which might represent translation errors. The
+msgid and msgstr strings are studied and compared. It is considered abnormal
+if one string starts or ends with a newline while the other does not. Also,
+if the string represents a format string used in a printf-like function,
+both strings should have the same number of % format specifiers, with
+matching types. If the flag
+.B c-format
+appears in the special comment
+.RB \&' # \&'
+for this entry, a check is performed.
+
+.SH USAGE
+.sp
+.LP
+The format of portable object files
+.RB ( \&.po
+files) is defined as
+follows. Each
+.B \&.po
+file contains one or more lines, with each line
+containing either a comment or a statement. Comments start the line with a
+pound sign
+.RB ( # )
+and end with the newline character. All comments
+(except special comments described later) and empty lines are ignored. The
+format of a statement is:
+.sp
+.in +2
+.nf
+.I "directive     value
+.fi
+.in -2
+.sp
+
+.sp
+.LP
+Each
+.I directive
+starts at the beginning of the line and is separated
+from
+.I value
+by white space (such as one or more space or tab
+characters).
+.I value
+consists of one or more quoted strings separated by
+white space. Use any of the following types of directives for the Solaris
+message file:
+.sp
+.in +2
+.nf
+.RI domain " domainname
+.RI msgid " message_identifier
+.RI msgstr " message_string
+.fi
+.in -2
+.sp
+
+.sp
+.LP
+For a GNU-compatible message file, use any of the following types of
+directives:
+.sp
+.in +2
+.nf
+.RI domain " domainname
+.RI msgid " message_identifier
+.RI msgid_plural " untranslated_string_plural
+.RI msgstr " message_string
+.RI msgstr[ n ] " message_string
+.fi
+.in -2
+.sp
+
+.sp
+.LP
+The behavior of the
+.B domain
+directive is affected by the options used.
+See OPTIONS for the behavior when the
+.B -o
+or
+.B -\(mioutput-file
+options are specified. If the
+.B -o
+or
+.B -\(mioutput-file
+options are
+not specified, the behavior of the
+.B domain
+directive is as follows:
+.RS +4
+.TP
+.ie t \(bu
+.el o
+All msgids from the beginning of each
+.B \&.po
+file to the first
+.B domain
+directive are put into a default message object file. The
+default message object file is named
+.BR messages.mo ,
+if the Solaris
+message catalog file format is used to generate the message object file or
+if the
+.BR -\(mistrict " or " \-S
+option is specified. Otherwise, the default message
+object file is named
+.BR messages .
+.RE
+.RS +4
+.TP
+.ie t \(bu
+.el o
+.RB "When " msgfmt " encounters a " domain 
+.I domainname
+directive in the
+.B \&.po
+file, all following msgids until the next
+.B domain
+directive are put into the message object file, named
+.BR domainname.mo ,
+if the Solaris message catalog file format is used to generate the message
+object file or if the
+.BR -\(mistrict " or " \-S
+option is specified. Otherwise, the
+msgids are put into the message object file named
+.BR domainname .
+.RE
+.RS +4
+.TP
+.ie t \(bu
+.el o
+Duplicate msgids are defined in the scope of each domain. That is, a msgid
+is considered a duplicate only if the identical msgid exists in the same
+domain.
+.RE
+.RS +4
+.TP
+.ie t \(bu
+.el o
+All duplicate msgids are ignored.
+.RE
+.sp
+.LP
+The
+.B msgid
+directive specifies the value of a message identifier
+associated with the directive that follows it. The
+.B msgid_plural
+directive specifies the plural form message specified to the plural message
+handling functions
+.BR ngettext() ,
+.BR dngettext() ,
+or
+.BR dcngettext() .
+The
+.I message_identifier
+string identifies a target
+.RB "string to be used at retrieval time. Each statement containing a" " msgid"
+directive must be followed by a statement containing a
+.BR msgstr
+directive or
+.BR msgstr [\c
+.IR n ]
+directives.
+.sp
+.LP
+The
+.B msgstr
+directive specifies the target string associated with the
+.I message_identifier
+string declared in the immediately preceding
+.B msgid
+directive.
+.sp
+.LP
+The directive
+.BR msgstr [\c
+.IR n ]
+(where
+.I n
+= 0, 1, 2, .\|.\|.)
+specifies the target string to be used with plural form handling functions
+.BR ngettext() ,
+.BR dngettext() ,
+and
+.BR dcngetttext() .
+.sp
+.LP
+Message strings can contain the escape sequences
+.B \en
+for newline,
+.B \et
+for tab,
+.B \ev
+for vertical tab,
+.B \eb
+for backspace,
+.B \er
+for carriage return,
+.B \ef
+for formfeed,
+.B \e\e
+for
+backslash,
+.B
+\e"
+for  double quote,
+.B \ea
+for alarm,
+.B \eddd
+for octal bit pattern, and
+.B \exDD
+for hexadecimal bit pattern.
+.sp
+.LP
+Comments for a GNU-compatible message file should be in one of the
+following formats (the
+.B msgfmt
+utility will ignore these comments when
+processing Solaris message files):
+.sp
+.in +2
+.nf
+.RI # " translator-comments
+.RI #. " automatic-comments
+.RI #: " reference" ..
+.RI #, " flag
+.fi
+.in -2
+.sp
+
+.sp
+.LP
+The
+.RB ' #: '
+comments indicate the location of the msgid string in the
+source files in
+.IR filename : line
+format. The
+.RB ' # ',
+.RB ' #. ',
+and
+.RB ' #: '
+comments are informative only and are silently ignored by the
+.B msgfmt
+utility. The
+.RB ' #, '
+comments require one or more flags
+separated by the comma character. The following
+.IR flag s
+can be
+specified:
+.sp
+.ne 2
+.TP 15n
+.B fuzzy
+This flag can be inserted by the translator. It shows that the
+.B msgstr
+string might not be a correct translation (anymore). Only the translator can
+judge if the translation requires further modification or is acceptable as
+is. Once satisfied with the translation, the translator removes this
+.B fuzzy
+flag. If this flag is specified, the
+.B msgfmt
+utility will
+not generate the entry for the immediately following msgid in the output
+message catalog.
+
+.sp
+.ne 2
+.PD 0
+.TP
+.B c-format
+.TP
+.B no-c-format
+.PD
+The
+.B c-format
+flag indicates that the
+.B msgid
+string is used as a
+format string by printf-like functions. In case the
+.B c-format
+flag is
+given for a string, the
+.B msgfmt
+utility does some more tests to check
+the validity of the translation.
+.RE
+
+.sp
+.LP
+In the GNU-compatible message file, the
+.B msgid
+entry with empty string
+("") is called the header entry and treated specially. If the message string
+for the header entry contains
+.BR nplurals =\c
+.IR value ,
+the value indicates the number of plural forms. For example, if
+.BR nplurals =4,
+there are four plural forms. If
+.B nplurals
+is defined, the same line
+should contain
+.BR plural =\c
+.IR expression ,
+separated by a semicolon character. The
+.I expression
+is a C language expression to determine
+which version of
+.BR msgstr [\c
+.IR n ]
+is to be used based on the value of
+.IR n ,
+the last argument of
+.BR ngettext() ,
+.BR dngettext() ,
+or
+.BR dcngettext() .
+For example,
+.sp
+.in +2
+.nf
+nplurals=2; plural= n == 1 ? 0 : 1
+.fi
+.in -2
+.sp
+
+.sp
+.LP
+indicates that there are two plural forms in the language. msgstr[0] is
+used if n == 1, otherwise msgstr[1] is used. For another example:
+.sp
+.in +2
+.nf
+nplurals=3; plural= n == 1 ? 0 : n == 2 ? 1 : 2
+.fi
+.in -2
+.sp
+
+.sp
+.LP
+indicates that there are three plural forms in the language. msgstr[0] is
+used if n == 1, msgstr[1] is used if n == 2, otherwise msgstr[2] is used.
+.sp
+.LP
+If the header entry contains a
+.BR charset =\c
+.I codeset
+string, the
+.I codeset
+is used to indicate the codeset to be used to encode the
+message strings. If the output string's codeset is different from the
+message string's codeset, codeset conversion from the message string's
+codeset to the output string's codeset will be performed upon the call of
+.BR gettext() ,
+.BR dgettext() ,
+.BR dcgettext() ,
+.BR ngettext() ,
+.BR dngettext() ,
+and
+.B dcngettext()
+for the GNU-compatible message
+catalogs. The output string's codeset is determined by the current locale's
+codeset (the return value of
+.BR nl_langinfo(CODESET ))
+by default, and can
+be changed by the call of
+.BR bind_textdomain_codeset() .
+.SS "Message catalog file format"
+.sp
+.LP
+The
+.B msgfmt
+utility can generate the message object both in Solaris
+message catalog file format and in GNU-compatible message catalog file
+format. If the
+.B -s
+option is specified and the input file is a Solaris
+.B \&.po
+file, the
+.B msgfmt
+utility generates the message object in
+Solaris message catalog file format. If the
+.B -g
+option is specified and
+the input file is a GNU
+.B \&.po
+file, the
+.B msgfmt
+utility generates
+the message object in GNU-compatible message catalog file format. If neither
+the
+.B -s
+nor
+.B -g
+option is specified, the
+.B msgfmt
+utility
+determines the message catalog file format as follows:
+.RS +4
+.TP
+.ie t \(bu
+.el o
+If the
+.B \&.po
+file contains a valid GNU header entry (having an empty
+string for
+.BR msgid ),
+the
+.B msgfmt
+utility uses the GNU-compatible
+message catalog file format.
+.RE
+.RS +4
+.TP
+.ie t \(bu
+.el o
+Otherwise, the
+.B msgfmt
+utility uses the Solaris message catalog file
+format.
+.RE
+.sp
+.LP
+If the
+.B msgfmt
+utility determined that the Solaris message catalog
+file format is used, as above, but found the
+.B \&.po
+file contains
+directives that are specific to the GNU-compatible message catalog file
+format, such as
+.B msgid_plural
+and
+.BR msgstr [\c
+.IR n ],
+the
+.B msgfmt
+utility handles those directives as invalid specifications.
+.SH EXAMPLES
+.LP
+.B Example 1
+Creating message objects from message files
+.sp
+.LP
+In this example,
+.B module1.po
+and
+.B module2.po
+are portable message
+objects files.
+
+.sp
+.in +2
+.nf
+.RB example% " cat module1.po
+# default domain "messages.mo"
+msgid  "msg 1"
+msgstr "msg 1 translation"
+#
+domain "help_domain"
+msgid  "help 2"
+msgstr "help 2 translation"
+#
+domain "error_domain"
+msgid  "error 3"
+msgstr "error 3 translation"
+.RB example% " cat module2.po
+# default domain "messages.mo"
+msgid  "mesg 4"
+msgstr "mesg 4 translation"
+#
+domain "error_domain"
+msgid  "error 5"
+msgstr "error 5 translation"
+#
+domain "window_domain"
+msgid  "window 6"
+msgstr "window 6 translation"
+.fi
+.in -2
+.sp
+
+.sp
+.LP
+The following command will produce the output files
+.BR messages.mo ,
+.BR help_domain.mo ,
+and
+.B error_domain.mo
+in Solaris message catalog
+file format:
+
+.sp
+.in +2
+.nf
+.RB example% " msgfmt module1.po
+.fi
+.in -2
+.sp
+
+.sp
+.LP
+The following command will produce the output files
+.BR messages.mo ,
+.BR help_domain.mo ,
+.BR error_domain.mo ,
+and
+.B window_domain.mo
+in
+Solaris message catalog file format:
+
+.sp
+.in +2
+.nf
+.RB example% " msgfmt module1.po module2.po
+.fi
+.in -2
+.sp
+
+.sp
+.LP
+The following command will produce the output file
+.B hello.mo
+in
+Solaris message catalog file format:
+
+.sp
+.in +2
+.nf
+.RB example% " msgfmt -o hello.mo module1.po module2.po
+.fi
+.in -2
+.sp
+
+.SH ENVIRONMENT VARIABLES
+.sp
+.LP
+See
+.BR environ (5)
+for descriptions of the following environmental
+variables that affect the execution of
+.BR msgfmt :
+.BR LC_CTYPE ,
+.BR LC_MESSAGES ,
+and
+.BR NLSPATH .
+.SH ATTRIBUTES
+.sp
+.LP
+See
+.BR attributes (5)
+for descriptions of the following attributes:
+.sp
+
+.sp
+.TS
+tab() box;
+cw(2.75i) |cw(2.75i)
+lw(2.75i) |lw(2.75i)
+.
+ATTRIBUTE TYPEATTRIBUTE VALUE
+_
+AvailabilitySUNWloc
+_
+CSIEnabled
+.TE
+
+.SH SEE ALSO
+.sp
+.LP
+.BR xgettext (1),
+.BR gettext (1),
+.BR ngettext (1),
+.BR gettext (3C),
+.BR setlocale (3C),
+.BR attributes (5),
+.BR environ (5)
+.SH NOTES
+.sp
+.LP
+Installing message catalogs under the C locale is pointless, since they are
+ignored for the sake of efficiency.

@@ -24,25 +24,7 @@
 # Use is subject to license terms.
 #
 
-cmake_minimum_required (VERSION 2.8.11)
-
-project(sintl)
-
-set(SINTL_MAJOR_VERSION "0")
-set(SINTL_MINOR_VERSION "1")
-set(SINTL_PATCH_VERSION "1")
-
-enable_testing()
-
-# the sintl library
-add_subdirectory(libsintl)
-# the sintl headers
-add_subdirectory(include)
-# the gettext / ngettext utilities
-add_subdirectory(gettext)
-# the msgfmt utilities
-add_subdirectory(msgfmt)
-# the xgettext utility
-add_subdirectory(xgettext)
-# manpages for utilities and functions
-add_subdirectory(man)
+install(FILES man1/gettext.1 DESTINATION man/man1)
+install(FILES man1/msgfmt.1 DESTINATION man/man1)
+install(FILES man1/xgettext.1 DESTINATION man/man1)
+install(FILES man3c/gettext.3c DESTINATION man/man3c)

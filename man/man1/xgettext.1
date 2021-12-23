@@ -1,0 +1,512 @@
+'\" te
+.\" Copyright (c) 1999, Sun Microsystems, Inc.  All Rights Reserved
+.\" Copyright (c) 2012-2020, J. Schilling
+.\" Copyright (c) 2013, Andreas Roehler
+.\" CDDL HEADER START
+.\"
+.\" The contents of this file are subject to the terms of the
+.\" Common Development and Distribution License ("CDDL"), version 1.0.
+.\" You may only use this file in accordance with the terms of version
+.\" 1.0 of the CDDL.
+.\"
+.\" A full copy of the text of the CDDL should have accompanied this
+.\" source.  A copy of the CDDL is also available via the Internet at
+.\" http://www.opensource.org/licenses/cddl1.txt
+.\"
+.\" When distributing Covered Code, include this CDDL HEADER in each
+.\" file and include the License file at usr/src/OPENSOLARIS.LICENSE.
+.\" If applicable, add the following below this CDDL HEADER, with the
+.\" fields enclosed by brackets "[]" replaced with your own identifying
+.\" information: Portions Copyright [yyyy] [name of copyright owner]
+.\"
+.\" CDDL HEADER END
+.TH xgettext 1 "27 Feb 2020" "SunOS 5.11" "User Commands"
+.SH NAME
+xgettext \- extract gettext call strings from C programs
+.SH SYNOPSIS
+.LP
+.nf
+.B xgettext \c
+.RB [ -HnPsSt "] [" "-a \c
+.RB [ "-x \c
+.IR exclude-file "]] [\c
+.BI -c " comment-tag\c
+]
+.RB "     [" "-d \c
+.IR default-domain "] [\c"
+.BR -j "] [" -m\c
+.IR " prefix" "] [\c"
+.B -M \c
+.IR suffix ]
+.RB "     [" "-p \c
+.IR pathname "] \c
+.RB [ --solaris "] \c
+.B -| \c
+.IR filename ...
+.fi
+
+.LP
+.nf
+.B xgettext -h
+.fi
+
+.SH DESCRIPTION
+.sp
+.LP
+The
+.B xgettext
+utility is used to automate the creation of portable
+.RB "message files (" \&.po "). A " \&.po
+file contains copies of "C"
+strings that are found in  ANSI C source code in
+.I filename
+or the
+standard input if
+.RB ` \(mi \&'
+is specified on the command line. The
+.B
+\&.po \c
+file can be used as input to the
+.BR msgfmt (1)
+utility, which
+produces a binary form of the message file that can be  used by application
+during run-time.
+.sp
+.LP
+.B xgettext
+writes
+.I msgid
+strings from
+.BR gettext (3C)
+or
+.BR ngettext (3C)
+calls in
+.I filename
+to the default output file
+.BR messages.po .
+The default
+output file name can be changed by
+.B -d
+option.
+.I msgid
+strings in
+.BR dgettext (3C)
+or
+.BR dngettext (3C)
+calls are written to the output file
+.B
+domainname\&.po \c
+where
+.B domainname
+is the first parameter to
+the
+.BR dgettext (3C)
+or
+.BR dngettext (3C)
+call.
+.sp
+.LP
+By default,
+.B xgettext
+creates a
+.B \&.po
+file in the current
+working directory, and each entry is in the same order that the strings are
+extracted from
+.IR filenames .
+When the
+.B -p
+option is specified, the
+.B
+\&.po \c
+file is created in the
+.I pathname
+directory. An existing
+.B
+\&.po \c
+file is overwritten.
+.sp
+.LP
+Duplicate
+.IR msgid s
+are written to the
+.B \&.po
+file as comment
+lines. When the
+.B -s
+option is specified, the
+.B \&.po
+is sorted by
+the
+.I msgid
+string, and all duplicated
+.IR msgid s
+are removed. All
+.I msgstr
+directives in the
+.B
+\&.po
+file are empty unless the
+.B
+-m
+option is used.
+.SH OPTIONS
+.sp
+.LP
+The following options are supported:
+.sp
+.ne 2
+.TP 21n
+.B -n
+Add comment lines to the output file indicating file name and line number in
+the source file where each extracted string is encountered. These lines
+appear before each
+.I msgid
+in the following format:
+.sp
+.in +2
+.nf
+# File: \c
+.IR filename ", \c
+.RI line: " line-number
+.fi
+.in -2
+.sp
+
+.sp
+.ne 2
+.PD 0
+.TP
+.B -H
+.TP
+.B --omit-header
+.PD
+Do not output the mime header to the
+.B \&.po
+file.
+
+.sp
+.ne 2
+.TP
+.B -s
+Generate output sorted by 
+.IR msgid s
+with all duplicate
+.IR msgid s
+removed.
+
+.sp
+.ne 2
+.TP
+.B --solaris
+Fall back to the Solaris features from 1992.
+Do not output a mime header and do not recognize the
+functions
+.BR ngettext (),
+.BR dngettext ()
+and
+.BR dcngettext ()
+while scanning the input for strings.
+
+.sp
+.ne 2
+.PD 0
+.TP
+.B -S
+.TP
+.B --strict
+.PD
+Implement strict uniforum support.
+This is currently a no-op.
+
+.sp
+.ne 2
+.TP
+.B -a
+Extract all strings, not just those found in
+.BR gettext (3C),
+and
+.B dgettext()
+calls. Only one
+.B \&.po
+file is created.
+
+.sp
+.ne 2
+.PD 0
+.TP
+.BI -c " comment-tag
+.TP
+.BI --add-comments " comment-tag
+.PD
+The comment block beginning with
+.I comment-tag
+as the first token of the
+comment block is added to the output
+.B \&.po
+file as
+.I #
+delimited
+comments. For multiple domains,
+.B xgettext
+directs comments and messages
+to the prevailing text domain.
+
+.sp
+.ne 2
+.TP
+.BI -d " default-domain
+Rename default output file from
+.B messages.po
+to
+.I default-domain
+.BR \&.po .
+
+.sp
+.ne 2
+.TP
+.B -j
+Join messages with existing message files.  If a
+.B \&.po
+file does not
+exist, it is created.  If a
+.B \&.po
+file does exist, new messages are
+appended. Any duplicate
+.BR msgid s
+are commented out in the resulting
+.B \&.po
+file.  Domain directives in the existing
+.B \&.po
+file are
+ignored. Results are not guaranteed if the existing message file has been
+edited.
+If used together with the
+.B -m
+or
+.B -M
+option, existing translations will be lost. 
+
+.sp
+.ne 2
+.TP
+.BI -k " keyword
+Specify
+.I keyword
+as an additional keyword to be looked for. If
+.I keyword
+is an empty string, this disables the use of default keywords.
+.sp
+If keyword is a C identifier,
+.B xgettext
+looks for strings in the first argument of each call to the
+function or macro keyword.
+If keyword is of the form
+.RI ` id : argnum ',
+.B xgettext
+looks for strings in the
+.IB argnum th
+argument of the call. If
+.I keyword
+is of the form
+.RI ` id :\c
+.IR argnum1 ,\c
+.IR argnum2 ',
+.B xgettext
+looks for strings in the
+.IB argnum1 st
+argument and in the
+.IB argnum2 nd
+argument of the call, and treats them as singular/plural variants for a
+message with plural handling.
+.sp
+If
+.I keyword
+is of the form
+.BI ` id : domainargnum\c
+.B d\c
+.RI , argnum1 [, argum2 ]'
+.B xgettext
+treats strings in the
+.IB domainargnum th
+argument as a domain specifier for
+.BR dgettext ()-like
+functions.
+.sp
+If
+.I keyword
+is of the form
+.BI ` id : domainargnum d\c
+\&',
+.B xgettext
+looks for a
+.BR textdomain ()-like
+function.
+.sp
+The argument numbers start at 1,
+.B msgid
+and
+.BR msgid_plural
+must have different values and
+the domain argument number must be lower
+than the numbers for
+.B msgid
+and
+.BR msgid_plural ;
+in other words, the domain argument must be before the message arguments.
+.sp
+The default keywords, which are always looked for if not explicitly disabled,
+are
+.BR gettext ,
+.BR gettext_l ,
+.BR dgettext:1d,2 ,
+.BR dgettext_l:1d,2 ,
+.BR ngettext:1,2 ,
+.BR ngettext_l:1,2 ,
+.BR dngettext:1d,2,3 ,
+.BR dngettext_l:1d,2,3
+and
+.BR textdomain:1d .
+.sp
+.ne 2
+.TP
+.BI -m " prefix
+Fill in the
+.I msgstr
+with
+.I prefix
+followed by the corresponding
+.IR msgid .
+This is useful for debugging
+purposes. To make
+.I msgstr
+identical to
+.IR msgid ,
+use an empty string (\c
+.B
+""\c
+) for
+.IR prefix .
+
+.sp
+.ne 2
+.TP
+.BI -M " suffix
+Fill in the
+.I msgstr
+with the corresponding
+.I msgid
+followed by 
+.IR suffix .
+This is useful for debugging
+purposes.
+
+.sp
+.ne 2
+.TP
+.BI -p " pathname
+Specify the directory where the output files will be placed. This option
+overrides the current working directory.
+
+.sp
+.ne 2
+.TP
+.B -P
+Undo the effects of the option
+.B \-\-solaris
+and implement support for the POSIX draft.
+
+.sp
+.ne 2
+.TP
+.B -t
+Do not look for strings in calls to
+.BR gettext (),
+.BR gettext_l (),
+.BR dgettext (),
+.BR dgettext_l (),
+.BR ngettext (),
+.BR ngettext_l (),
+.BR dngettext (),
+.BR dngettext_ ()
+but rather for strings that appear in calls to
+.BR dcgettext (),
+.BR dcgettext_l (),
+.BR dcngettext ()
+and
+.BR dcngettext_l ().
+
+.sp
+.ne 2
+.TP
+.BI -x " exclude-file
+Specify a
+.B \&.po
+file that contains a list of
+.IR msgid s
+that are
+not to be extracted from the input files. The format of
+.I exclude-file
+is
+identical to the
+.B \&.po
+file. However, only the
+.I msgid
+directive
+line in
+.I exclude-file
+is used. All other lines are simply ignored.  The
+.B -x
+option can only be used with the
+.B -a
+option.
+
+.sp
+.ne 2
+.TP
+.B -h
+Print a help message on the standard output.
+.RE
+
+.SH ATTRIBUTES
+.sp
+.LP
+See
+.BR attributes (5)
+for descriptions of the following attributes:
+.sp
+
+.sp
+.TS
+tab() box;
+cw(2.75i) |cw(2.75i)
+lw(2.75i) |lw(2.75i)
+.
+ATTRIBUTE TYPEATTRIBUTE VALUE
+_
+AvailabilitySUNWloc
+.TE
+
+.SH SEE ALSO
+.sp
+.LP
+.BR msgfmt (1),
+.BR gettext (1),
+.BR ngettext (1),
+.BR gettext (3C),
+.BR attributes (5)
+.SH NOTES
+.sp
+.LP
+.B xgettext
+is not able to extract cast strings, for example ANSI C casts
+of literal strings to
+.BR "(const char *)" .
+This is unnecessary anyway, since
+the prototypes in
+.B <libintl.h>
+already specify this type.
+.sp
+.LP
+In messages and translation notes, lines greater than 2048 characters are
+truncated to 2048 characters and a warning message is printed to stderr.
