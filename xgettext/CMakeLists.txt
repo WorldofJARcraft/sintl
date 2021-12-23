@@ -1,11 +1,9 @@
-#!/bin/sh
 #
 # CDDL HEADER START
 #
 # The contents of this file are subject to the terms of the
-# Common Development and Distribution License, Version 1.0 only
-# (the "License").  You may not use this file except in compliance
-# with the License.
+# Common Development and Distribution License (the "License").
+# You may not use this file except in compliance with the License.
 #
 # You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
 # or http://www.opensolaris.org/os/licensing.
@@ -20,10 +18,18 @@
 #
 # CDDL HEADER END
 #
-#
-# Copyright (c) 2000 by Sun Microsystems, Inc.
-# All rights reserved.
-#
-#pragma ident	"%Z%%M%	%I%	%E% SMI"
 
-echo_file	usr/src/lib/libc/inc/msgfmt.h
+#
+# Copyright 2021 Eric Ackermann.  All rights reserved.
+# Use is subject to license terms.
+#
+
+find_package(FLEX)
+
+flex_target(xgettext_lex xgettext.lx.l  ${CMAKE_CURRENT_BINARY_DIR}/xgettext_lex.c)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+
+list(APPEND XGETTEXT_SOURCES xgettext.c)
+
+add_executable(xgettext ${XGETTEXT_SOURCES} ${FLEX_xgettext_lex_OUTPUTS})
