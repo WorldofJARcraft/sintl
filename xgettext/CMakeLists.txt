@@ -33,3 +33,5 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 list(APPEND XGETTEXT_SOURCES xgettext.c)
 
 add_executable(xgettext ${XGETTEXT_SOURCES} ${FLEX_xgettext_lex_OUTPUTS})
+
+install(TARGETS xgettext DESTINATION bin)

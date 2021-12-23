@@ -52,3 +52,6 @@ target_include_directories(smsgfmt PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../includ
 include(${CMAKE_CURRENT_SOURCE_DIR}/../config/CMakeLists.txt)
 
 configure_libsintl(sintl)
+
+
+install(TARGETS msgfmt msgfmt_rev smsgfmt DESTINATION bin)

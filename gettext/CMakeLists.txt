@@ -32,3 +32,7 @@ target_link_libraries(gettext sintl)
 # ngettext can be a hardlink to gettext
 ADD_CUSTOM_TARGET(ngettext ALL
                   COMMAND ${CMAKE_COMMAND} -E create_symlink ngettext gettext)
+
+install(TARGETS gettext DESTINATION bin)
+# ngettext is only a symlink, cannot be installed like gettext
+install(FILES ${PROJECT_BINARY_DIR}/gettext/ngettext DESTINATION bin)

@@ -34,6 +34,8 @@ set(SINTL_PATCH_VERSION "1")
 
 # the sintl library
 add_subdirectory(libsintl)
+# the sintl headers
+add_subdirectory(include)
 # the gettext / ngettext utilities
 add_subdirectory(gettext)
 # the msgfmt utilities
