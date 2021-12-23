@@ -29,6 +29,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <locale.h>
 #include <unistd.h>
 
 // original Solaris code uses fstat64(), which is not portable to e.g. Linux
@@ -80,4 +81,57 @@ static int libsintl_naive_issetugid(void){
 #else
     #define libsintl_issetugid libsintl_naive_issetugid
 #endif
+
+#define HAVE_QUERYLOCALE_OR_GETLOCALENAME_L (defined(HAVE_GETLOCALENAME_L) || defined(HAVE_QUERYLOCALE))
+#define HAVE_USABLE_USELOCALE (defined(HAVE_USELOCALE) && HAVE_QUERYLOCALE_OR_GETLOCALENAME_L)
+
+// without these interfaces, there is no way of mapping a locale_t to a locale name 
+#if HAVE_USABLE_USELOCALE
+static char *libsintl_locale_to_char(int category, locale_t locale){
+    #ifdef HAVE_GETLOCALENAME_L
+        // this new interface allows portably mapping locale to name, see https://www.austingroupbugs.net/view.php?id=1220
+        // preferable over querylocale even if both exist, since no mapping of LC_* to LC_*_MASK needed
+        // LC_GLOBAL_LOCALE is unspecified, but it cannot be used by the gettext functions anyway
+        return getlocalename_l(category, locale);
+    #elif defined(HAVE_QUERYLOCALE)
+        // e.g. LC_CTYPE -> LC_CTYPE_MASK
+        #define QUERYLOCALE_BITMAP_CASE(locale_type) #ifdef locale_type \
+            case locale_type: \
+                return querylocale(locale_type##_MASK, locale); \
+            endif
+        
+        switch (category)
+        {
+        QUERYLOCALE_BITMAP_CASE(LC_CTYPE);
+        QUERYLOCALE_BITMAP_CASE(LC_NUMERIC);
+        QUERYLOCALE_BITMAP_CASE(LC_TIME);
+        QUERYLOCALE_BITMAP_CASE(LC_COLLATE);
+        QUERYLOCALE_BITMAP_CASE(LC_MONETARY);
+        QUERYLOCALE_BITMAP_CASE(LC_PAPER);
+        QUERYLOCALE_BITMAP_CASE(LC_NAME);
+        QUERYLOCALE_BITMAP_CASE(LC_ADDRESS);
+        QUERYLOCALE_BITMAP_CASE(LC_TELEPHONE);
+        QUERYLOCALE_BITMAP_CASE(LC_MEASUREMENT);
+        QUERYLOCALE_BITMAP_CASE(LC_IDENTIFICATION);
+        // LC_MESSAGES needs to exist, and it is a suitable default
+        default:
+            return querylocale(LC_MESSAGES_MASK, locale);
+        }
+    #endif
+        // never reached
+}
+#endif
+
+static char *libsintl_query_locale(int category){
+#if HAVE_USABLE_USELOCALE
+    locale_t thread_locale = uselocale(NULL);
+    if(thread_locale != LC_GLOBAL_LOCALE){
+    // results unspecified for LC_GLOBAL_LOCALE
+        return libsintl_locale_to_char(category, thread_locale);
+    }
+    // if no locale set for this thread, we need to query the global locale from setlocale
+    
+#endif
+    return setlocale(category, NULL);
+}
 #endif

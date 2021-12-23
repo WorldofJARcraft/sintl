@@ -47,6 +47,7 @@
 #include <sys/param.h>
 #include "_loc_path.h"
 #include "libintl.h"
+#include "libsintl_config.h"
 #include "msgfmt.h"
 #include "gettext.h"
 
@@ -132,7 +133,7 @@ textdomain(const char *domain)
 
 /*
  * gettext() is a pass-thru to _real_gettext_u() with a NULL pointer passed
- * for domain and LC_MESSAGES passed for category.
+ * for domain, 0 passed for locale and LC_MESSAGES passed for category.
  */
 char *
 gettext(const char *msg_id)
@@ -142,11 +143,34 @@ gettext(const char *msg_id)
 
 	callout_lock_enter();
 	INIT_GT((char *)msg_id);
-	res = _real_gettext_u(NULL, msg_id, NULL, 0, LC_MESSAGES, 0);
+	res = _real_gettext_u(NULL, msg_id, NULL, 0, LC_MESSAGES, 0, (locale_t) 0);
 	callout_lock_exit();
 	errno = errno_save;
 	return (res);
 }
+
+// without a way of mapping locale_t to locale names, the *_l() functions cannot be implemented.
+#if HAVE_QUERYLOCALE_OR_GETLOCALENAME_L
+/*
+ * gettext_l() is a pass-thru to _real_gettext_u() with a NULL pointer passed
+ * for domain and LC_MESSAGES passed for category.
+ */
+char *
+gettext_l(const char *msg_id, locale_t locale)
+{
+	char	*res;
+	int	errno_save = errno;
+
+	callout_lock_enter();
+	INIT_GT((char *)msg_id);
+	res = _real_gettext_u(NULL, msg_id, NULL, 0, LC_MESSAGES, 0, locale);
+	callout_lock_exit();
+	errno = errno_save;
+	return (res);
+}
+
+#endif
+
 
 
 /*
@@ -160,11 +184,30 @@ dgettext(const char *domain, const char *msg_id)
 
 	callout_lock_enter();
 	INIT_GT((char *)msg_id);
-	res = _real_gettext_u(domain, msg_id, NULL, 0, LC_MESSAGES, 0);
+	res = _real_gettext_u(domain, msg_id, NULL, 0, LC_MESSAGES, 0, (locale_t) 0);
 	callout_lock_exit();
 	errno = errno_save;
 	return (res);
 }
+
+#if HAVE_QUERYLOCALE_OR_GETLOCALENAME_L
+/*
+ * In dcgettext() call, domain is valid only for this call.
+ */
+char *
+dgettext_l(const char *domain, const char *msg_id, locale_t locale)
+{
+	char	*res;
+	int	errno_save = errno;
+
+	callout_lock_enter();
+	INIT_GT((char *)msg_id);
+	res = _real_gettext_u(domain, msg_id, NULL, 0, LC_MESSAGES, 0, locale);
+	callout_lock_exit();
+	errno = errno_save;
+	return (res);
+}
+#endif
 
 char *
 dcgettext(const char *domain, const char *msg_id, const int category)
@@ -174,11 +217,27 @@ dcgettext(const char *domain, const char *msg_id, const int category)
 
 	callout_lock_enter();
 	INIT_GT((char *)msg_id);
-	res = _real_gettext_u(domain, msg_id, NULL, 0, category, 0);
+	res = _real_gettext_u(domain, msg_id, NULL, 0, category, 0, (locale_t) 0);
 	callout_lock_exit();
 	errno = errno_save;
 	return (res);
 }
+
+#if HAVE_QUERYLOCALE_OR_GETLOCALENAME_L
+char *
+dcgettext_l(const char *domain, const char *msg_id, const int category, locale_t locale)
+{
+	char	*res;
+	int	errno_save = errno;
+
+	callout_lock_enter();
+	INIT_GT((char *)msg_id);
+	res = _real_gettext_u(domain, msg_id, NULL, 0, category, 0, locale);
+	callout_lock_exit();
+	errno = errno_save;
+	return (res);
+}
+#endif
 
 char *
 ngettext(const char *msgid1, const char *msgid2, unsigned long int n)
@@ -188,11 +247,27 @@ ngettext(const char *msgid1, const char *msgid2, unsigned long int n)
 
 	callout_lock_enter();
 	INIT_GT((char *)msgid1);
-	res = _real_gettext_u(NULL, msgid1, msgid2, n, LC_MESSAGES, 1);
+	res = _real_gettext_u(NULL, msgid1, msgid2, n, LC_MESSAGES, 1, (locale_t) 0);
 	callout_lock_exit();
 	errno = errno_save;
 	return (res);
 }
+
+#if HAVE_QUERYLOCALE_OR_GETLOCALENAME_L
+char *
+ngettext_l(const char *msgid1, const char *msgid2, unsigned long int n, locale_t locale)
+{
+	char	*res;
+	int	errno_save = errno;
+
+	callout_lock_enter();
+	INIT_GT((char *)msgid1);
+	res = _real_gettext_u(NULL, msgid1, msgid2, n, LC_MESSAGES, 1, locale);
+	callout_lock_exit();
+	errno = errno_save;
+	return (res);
+}
+#endif 
 
 char *
 dngettext(const char *domain, const char *msgid1, const char *msgid2,
@@ -203,11 +278,28 @@ dngettext(const char *domain, const char *msgid1, const char *msgid2,
 
 	callout_lock_enter();
 	INIT_GT((char *)msgid1);
-	res = _real_gettext_u(domain, msgid1, msgid2, n, LC_MESSAGES, 1);
+	res = _real_gettext_u(domain, msgid1, msgid2, n, LC_MESSAGES, 1, (locale_t) 0);
 	callout_lock_exit();
 	errno = errno_save;
 	return (res);
 }
+
+#if HAVE_QUERYLOCALE_OR_GETLOCALENAME_L
+char *
+dngettext_l(const char *domain, const char *msgid1, const char *msgid2,
+	unsigned long int n, locale_t locale)
+{
+	char	*res;
+	int	errno_save = errno;
+
+	callout_lock_enter();
+	INIT_GT((char *)msgid1);
+	res = _real_gettext_u(domain, msgid1, msgid2, n, LC_MESSAGES, 1, locale);
+	callout_lock_exit();
+	errno = errno_save;
+	return (res);
+}
+#endif
 
 char *
 dcngettext(const char *domain, const char *msgid1, const char *msgid2,
@@ -218,8 +310,25 @@ dcngettext(const char *domain, const char *msgid1, const char *msgid2,
 
 	callout_lock_enter();
 	INIT_GT((char *)msgid1);
-	res = _real_gettext_u(domain, msgid1, msgid2, n, category, 1);
+	res = _real_gettext_u(domain, msgid1, msgid2, n, category, 1, (locale_t) 0);
 	callout_lock_exit();
 	errno = errno_save;
 	return (res);
 }
+
+#if HAVE_QUERYLOCALE_OR_GETLOCALENAME_L
+char *
+dcngettext_l(const char *domain, const char *msgid1, const char *msgid2,
+	unsigned long int n, int category, locale_t locale)
+{
+	char	*res;
+	int	errno_save = errno;
+
+	callout_lock_enter();
+	INIT_GT((char *)msgid1);
+	res = _real_gettext_u(domain, msgid1, msgid2, n, category, 1, locale);
+	callout_lock_exit();
+	errno = errno_save;
+	return (res);
+}
+#endif

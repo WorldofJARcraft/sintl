@@ -29,33 +29,11 @@
 
 #pragma ident	"%Z%%M%	%I%	%E% SMI"
 
+#include <locale.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
-/*
- * wchar_t is a built-in type in standard C++ and as such is not
- * defined here when using standard C++. However, the GNU compiler
- * fixincludes utility nonetheless creates its own version of this
- * header for use by gcc and g++. In that version it adds a redundant
- * guard for __cplusplus. To avoid the creation of a gcc/g++ specific
- * header we need to include the following magic comment:
- *
- * we must use the C++ compiler's type
- *
- * The above comment should not be removed or changed until GNU
- * gcc/fixinc/inclhack.def is updated to bypass this header.
- */
-#if !defined(__cplusplus) || (__cplusplus < 199711L && !defined(__GNUG__))
-#ifndef _WCHAR_T
-#define	_WCHAR_T
-#if defined(_LP64)
-typedef int	wchar_t;
-#else
-typedef long	wchar_t;
-#endif
-#endif	/* !_WCHAR_T */
-#endif	/* !defined(__cplusplus) ... */
 
 #define	TEXTDOMAINMAX	256
 
@@ -80,6 +58,21 @@ extern char *dngettext(const char *, const char *,
 extern char *ngettext(const char *, const char *, unsigned long int);
 extern char *bind_textdomain_codeset(const char *, const char *);
 
+/*
+ * To be added in POSIX issue 8, see https://posix.rhansen.org/p/gettext_draft
+ */
+extern char *dcgettext_l(const char *restrict, const char *restrict, 
+	int, locale_t);
+extern char *dcngettext_l(const char *restrict, const char *restrict, 
+	const char *restrict, unsigned long int, int, locale_t);
+extern char *dgettext_l(const char *restrict, const char *restrict,
+	locale_t);
+extern char *dngettext_l(const char *restrict, const char *restrict,
+	const char *restrict, unsigned long int, locale_t);
+extern char *gettext_l(const char *, locale_t);
+extern char *ngettext_l(const char *restrict, const char *restrict,
+	unsigned long int, locale_t);
+
 #else
 extern char *dcgettext();
 extern char *dgettext();
@@ -96,6 +89,15 @@ extern char *dngettext();
 extern char *ngettext();
 extern char *bind_textdomain_codeset();
 
+/*
+ * To be added in POSIX issue 8, see https://posix.rhansen.org/p/gettext_draft
+ */
+extern char *dcgettext_l();
+extern char *dcngettext_l();
+extern char *dgettext_l();
+extern char *dngettext_l();
+extern char *gettext_l();
+extern char *ngettext_l();
 #endif
 
 #ifdef	__cplusplus

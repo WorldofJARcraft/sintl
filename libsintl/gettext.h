@@ -192,7 +192,7 @@ extern Gettext_t	*global_gt;
 extern char	*_textdomain_u(const char *, char *);
 extern char	*_real_bindtextdomain_u(const char *, const char *, int);
 extern char	*_real_gettext_u(const char *, const char *,
-    const char *, unsigned long int, int, int);
+    const char *, unsigned long int, int, int, locale_t);
 extern char	*handle_mo(struct msg_pack *);
 
 extern int	gnu_setmsg(Msg_node *, char *, size_t);

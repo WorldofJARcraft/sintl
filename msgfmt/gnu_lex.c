@@ -53,7 +53,7 @@ get_mb(unsigned char *tmpbuf, unsigned char fc)
 {
 	int	c;
 	char	outbuf[8];			/* max size of a UTF-8 char */
-	const char	*inptr;
+	char	*inptr;
 	char	*outptr;
 	size_t	insize = 0, inlen, outlen, ret;
 
@@ -66,7 +66,7 @@ get_mb(unsigned char *tmpbuf, unsigned char fc)
 	}
 
 	for (; ; ) {
-		inptr = (const char *)tmpbuf;
+		inptr = tmpbuf;
 		outptr = &outbuf[0];
 		inlen = insize;
 		outlen = sizeof (outbuf);

@@ -490,7 +490,7 @@ warning(gettext(WARN_MISSING_QUOTE_AT_EOL), linenum);
 				break;
 
 			case L'\\':
-				if ((mb = expand_meta(&linebufptr)) != NULL)
+				if ((mb = expand_meta(&linebufptr)) != '\0')
 					bufptr[bufptr_index++] = mb;
 				break;
 
@@ -627,7 +627,7 @@ expand_meta(wchar_t **buf)
 		}
 		return (n);
 	default:
-		return (NULL);
+		return 0;
 	}
 } /* expand_meta */
 

@@ -50,7 +50,7 @@ static char	*replace_nls_option(char *, const char *, char *,
 
 char *
 _real_gettext_u(const char *domain, const char *msgid1, const char *msgid2,
-    unsigned long int ln, int category, int plural)
+    unsigned long int ln, int category, int plural, locale_t locale)
 {
 	char	msgfile[MAXPATHLEN]; 	/* 1024 */
 	char	mydomain[TEXTDOMAINMAX + 1]; /* 256 + 1 */
@@ -77,11 +77,15 @@ _real_gettext_u(const char *domain, const char *msgid1, const char *msgid2,
 
 	mp = memset(&omp, 0, sizeof (omp));	/* msg pack */
 
-	/*
-	 * category may be LC_MESSAGES or LC_TIME
-	 * locale contains the value of 'category'
-	 */
-	cur_locale = setlocale(category, NULL);
+	#if HAVE_QUERYLOCALE_OR_GETLOCALENAME_L
+		/*
+	 	* category may be LC_MESSAGES or LC_TIME
+	 	* locale contains the value of 'category'
+	 	*/
+		cur_locale = locale ? libsintl_locale_to_char(locale) : libsintl_query_locale(category);
+	#else
+		cur_locale = libsintl_query_locale(category);
+	#endif
 
 	language = getenv("LANGUAGE"); /* for GNU */
 	if (language) {
@@ -136,8 +140,12 @@ _real_gettext_u(const char *domain, const char *msgid1, const char *msgid2,
 	} else {
 		/* NLSPATH is set */
 		int	ret;
-
-		msgloc = setlocale(LC_MESSAGES, NULL);
+		
+		#if HAVE_QUERYLOCALE_OR_GETLOCALENAME_L
+			msgloc = locale ? libsintl_locale_to_char(locale) : libsintl_query_locale(LC_MESSAGES);
+		#else
+			msgloc = libsintl_query_locale(LC_MESSAGES);
+		#endif
 
 		ret = process_nlspath(cur_domain, msgloc,
 		    (const char *)nlspath, &cur_binding);
